@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  yarr:
+    container_name: yarr
+    image: yangkghjh/yarr:latest
+    ports:
+      - 7070:7070/tcp # WebUI
+    restart: always
+    volumes:
+      - "!data/yarr:/data"

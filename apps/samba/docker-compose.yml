@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  samba:
+    container_name: samba
+    image: dperson/samba
+    ports:
+      - 139:139/tcp
+      - 445:445/tcp
+    restart: always
+    volumes:
+      - "/yacht:/mount"
+    environment:
+      - SHARE=yacht;/mount

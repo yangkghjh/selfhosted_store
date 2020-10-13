@@ -1,0 +1,58 @@
+[
+  {
+    "type": 1,
+    "title": "Samba",
+    "name": "samba",
+    "description": "Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.",
+    "categories": [
+      "Files"
+    ],
+    "platform": "linux",
+    "note": "Open with \\\\IP\\yacht ,Iamges: https://hub.docker.com/r/dperson/samba",
+    "image": "dperson/samba",
+    "restart_policy": "unless-stopped",
+    "ports": [
+      {
+        "139": "139:139/tcp",
+        "445": "445:445/tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/mount",
+        "bind": "/yacht"
+      }
+    ],
+    "env": [
+      {
+        "name": "SHARE",
+        "label": "SHARE",
+        "default": "yacht;/mount"
+      }
+    ]
+  },
+  {
+    "type": 1,
+    "title": "Yarr",
+    "name": "yarr",
+    "description": "开源 RSS 阅读器，Go 实现，数据存储于 SQLite。",
+    "categories": [
+      "Read"
+    ],
+    "platform": "linux",
+    "note": "通过 IP:7070 打开。",
+    "image": "yangkghjh/yarr:latest",
+    "restart_policy": "unless-stopped",
+    "ports": [
+      {
+        "7070": "7070:7070/tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/data",
+        "bind": "!data/yarr"
+      }
+    ]
+  }
+]
