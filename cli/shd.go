@@ -2,68 +2,53 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
+	"time"
 
-	"github.com/yankghjh/store/cli/generator"
+	"github.com/yankghjh/selfhosted_store/cli/pipe"
 
-	"github.com/yankghjh/store/cli/app"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/app"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/yacht"
+
+	"github.com/spf13/viper"
 )
 
-var appspath = "./apps"
+var starttime time.Time
 
-func main() {
-	files, _ := ioutil.ReadDir(appspath)
-
-	apps := []*app.App{}
-	for _, f := range files {
-		if f.IsDir() {
-			app, err := handleApp(f)
-			if err != nil {
-				fmt.Printf("handle %s error: %s\n", f.Name(), err)
-				os.Exit(1)
-			}
-
-			apps = append(apps, app)
-		}
-	}
-
-	templete, errs, err := generator.GenerateYachtTemplate(apps)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	if errs != nil {
-		for _, e := range errs {
-			fmt.Println(e)
-		}
-	}
-
-	fmt.Println(string(templete))
+func init() {
+	starttime = time.Now()
+	viper.SetDefault("source", "apps")
+	viper.SetDefault("dist", "templates")
 }
 
-func handleApp(f os.FileInfo) (*app.App, error) {
-	appFile := appspath + "/" + f.Name() + "/" + "app.yml"
-	appYaml, err := ioutil.ReadFile(appFile)
+func main() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
 	if err != nil {
-		return nil, err
+		fmt.Println("no conifg file found, use default config")
 	}
 
-	composeFile := appspath + "/" + f.Name() + "/" + "docker-compose.yml"
-	composeYaml, err := ioutil.ReadFile(composeFile)
-	if err != nil {
-		return nil, err
+	opt := pipe.Opition{
+		SourcePath: viper.GetString("source"),
+		DistPath:   viper.GetString("dist"),
+		Sources:    []string{"app", "docker-compose"},
+		Handlers:   []string{"yacht"},
 	}
 
-	app, err := app.NewApp(appYaml)
+	p, err := pipe.NewPipe(opt)
 	if err != nil {
-		return nil, err
+		fmt.Println("create pipe error: ", err)
+		return
 	}
 
-	err = app.LoadDockerCompose(composeYaml)
+	err = p.Run()
 	if err != nil {
-		return nil, err
+		fmt.Println("run pipe error: ", err)
+		return
 	}
 
-	return app, nil
+	fmt.Printf("parsed %d apps in %s\n", p.Count, time.Now().Sub(starttime))
 }
