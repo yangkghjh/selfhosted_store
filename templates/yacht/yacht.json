@@ -5,6 +5,7 @@
     "description": "Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.",
     "categories": null,
     "platform": "linux",
+    "logo": "https://raw.githubusercontent.com/yangkghjh/selfhosted_store/main/templates/assets/icons/autoindex.png",
     "name": "autoindex",
     "image": "yangkghjh/autoindex:latest",
     "restart_policy": "unless-stopped",
@@ -16,7 +17,7 @@
     "volumes": [
       {
         "container": "/data",
-        "bind": "data"
+        "bind": "/data"
       }
     ]
   },
