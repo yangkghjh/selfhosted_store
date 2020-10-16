@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  autoindex:
+    container_name: autoindex
+    image: yangkghjh/autoindex:latest
+    ports:
+      - 4000:4000
+    restart: always
+    volumes:
+      - "./data:/data"

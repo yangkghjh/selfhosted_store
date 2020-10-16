@@ -1,6 +1,27 @@
 [
   {
     "type": 1,
+    "title": "AutoIndex",
+    "description": "Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.",
+    "categories": null,
+    "platform": "linux",
+    "name": "autoindex",
+    "image": "yangkghjh/autoindex:latest",
+    "restart_policy": "unless-stopped",
+    "ports": [
+      {
+        "4000": "4000:4000/tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/data",
+        "bind": "data"
+      }
+    ]
+  },
+  {
+    "type": 1,
     "title": "AWTRIX2",
     "description": "(AWsome maTRIX) is a full color dot matrix that displays applications from simple time display to Fortnite account statistics.",
     "categories": null,

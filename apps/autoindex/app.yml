@@ -1,0 +1,4 @@
+type: container
+name: AutoIndex
+description: Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.
+platform: linux
