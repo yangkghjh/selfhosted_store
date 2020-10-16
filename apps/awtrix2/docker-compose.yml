@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  awtrix2:
+    container_name: awtrix2
+    image: whyet/awtrix2:latest
+    ports:
+      - 7000:7000
+      - 7001:7001
+      - 5568:5568/udp
+    restart: always
+    volumes:
+      - "!data/awtrix2:/data"
