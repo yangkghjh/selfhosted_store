@@ -1,6 +1,5 @@
 type: container
-title: Yarr
-name: yarr
+name: Yarr
 description: 开源 RSS 阅读器，Go 实现，数据存储于 SQLite。
 categories:
   - Read

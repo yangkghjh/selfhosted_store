@@ -24,6 +24,7 @@ type App struct {
 func Loader(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	path := ctx.GetPath("app.yml")
 	data := viper.New()
+	data.SetConfigType("yml")
 
 	file, err := os.Open(path)
 	if err != nil {

@@ -1,6 +1,5 @@
 type: container
-title: Samba
-name: samba
+name: Samba
 description: Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.
 categories:
   - Files
