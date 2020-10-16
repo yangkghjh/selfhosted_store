@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/yankghjh/selfhosted_store/cli/modules/icon"
+
 	"github.com/yankghjh/selfhosted_store/cli/modules/app"
 	compose "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
 	"github.com/yankghjh/selfhosted_store/cli/pipe"
@@ -27,10 +29,11 @@ type Dataset struct {
 type Template struct {
 	Type        int      `json:"type"`
 	Title       string   `json:"title"`
-	Description string   `json:"description"`
+	Description string   `json:"description,omitempty"`
 	Categories  []string `json:"categories"`
 	Platform    string   `json:"platform"`
-	Note        string   `json:"note"`
+	Note        string   `json:"note,omitempty"`
+	Logo        string   `json:"logo,omitempty"`
 
 	Name          string              `json:"name"`
 	Image         string              `json:"image"`
@@ -99,6 +102,9 @@ func Handler(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	t.Categories = a.Data.GetStringSlice("categories")
 	t.Platform = a.Data.GetString("platform")
 	t.Note = a.Data.GetString("note")
+	if v := ctx.Get("icon"); v != nil {
+		t.Logo = v.(*icon.Icon).URL
+	}
 
 	t.Name = service.ContainerName
 	t.Image = service.Image

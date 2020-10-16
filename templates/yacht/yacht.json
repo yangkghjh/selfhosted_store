@@ -2,10 +2,31 @@
   {
     "type": 1,
     "title": "",
-    "description": "",
     "categories": null,
     "platform": "",
-    "note": "",
+    "logo": "https://raw.githubusercontent.com/yangkghjh/selfhosted_store/main/templates/assets/icons/awtrix2.png",
+    "name": "awtrix2",
+    "image": "whyet/awtrix2:latest",
+    "restart_policy": "unless-stopped",
+    "ports": [
+      {
+        "5568": "5568:5568/udp",
+        "7000": "7000:7000/tcp",
+        "7001": "7001:7001/tcp"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/data",
+        "bind": "!data/yarr"
+      }
+    ]
+  },
+  {
+    "type": 1,
+    "title": "",
+    "categories": null,
+    "platform": "",
     "name": "samba",
     "image": "dperson/samba",
     "restart_policy": "unless-stopped",
@@ -32,10 +53,8 @@
   {
     "type": 1,
     "title": "",
-    "description": "",
     "categories": null,
     "platform": "",
-    "note": "",
     "name": "yarr",
     "image": "yangkghjh/yarr:latest",
     "restart_policy": "unless-stopped",

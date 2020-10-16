@@ -5,12 +5,14 @@ import "strings"
 // Context of the pipe
 type Context struct {
 	Path string
+	Name string
 	data map[string]interface{}
 }
 
 // NewContext for the pipeline of one app
-func NewContext(path string) *Context {
+func NewContext(name string, path string) *Context {
 	return &Context{
+		Name: name,
 		Path: path,
 		data: map[string]interface{}{},
 	}

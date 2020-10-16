@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 /**
@@ -40,6 +42,7 @@ type Opition struct {
 	DistPath   string
 	Sources    []string
 	Handlers   []string
+	Config     *viper.Viper
 }
 
 // InitFunc called before loading apps
@@ -112,7 +115,7 @@ func (p *Pipe) Run() error {
 	apps := []*Context{}
 	for _, f := range files {
 		if f.IsDir() {
-			apps = append(apps, NewContext(p.SourcePath+"/"+f.Name()))
+			apps = append(apps, NewContext(f.Name(), p.SourcePath+"/"+f.Name()))
 		}
 	}
 	p.Count = len(apps)

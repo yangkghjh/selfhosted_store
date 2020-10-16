@@ -8,34 +8,39 @@ import (
 
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/app"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/icon"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/yacht"
 
 	"github.com/spf13/viper"
 )
 
 var starttime time.Time
+var cfg *viper.Viper
 
 func init() {
 	starttime = time.Now()
-	viper.SetDefault("source", "apps")
-	viper.SetDefault("dist", "templates")
+	cfg = viper.New()
+	cfg.SetDefault("source", "apps")
+	cfg.SetDefault("dist", "templates")
+	cfg.SetDefault("icon.basepath", "https://raw.githubusercontent.com/yangkghjh/selfhosted_store/main/")
 }
 
 func main() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yml")
-	viper.AddConfigPath(".")
+	cfg.SetConfigName("config")
+	cfg.SetConfigType("yml")
+	cfg.AddConfigPath(".")
 
-	err := viper.ReadInConfig()
+	err := cfg.ReadInConfig()
 	if err != nil {
 		fmt.Println("no conifg file found, use default config")
 	}
 
 	opt := pipe.Opition{
-		SourcePath: viper.GetString("source"),
-		DistPath:   viper.GetString("dist"),
-		Sources:    []string{"app", "docker-compose"},
+		SourcePath: cfg.GetString("source"),
+		DistPath:   cfg.GetString("dist"),
+		Sources:    []string{"app", "docker-compose", "icon"},
 		Handlers:   []string{"yacht"},
+		Config:     cfg,
 	}
 
 	p, err := pipe.NewPipe(opt)
