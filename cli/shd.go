@@ -9,6 +9,7 @@ import (
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/app"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/icon"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/unraid"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/yacht"
 
 	"github.com/spf13/viper"
@@ -23,6 +24,9 @@ func init() {
 	cfg.SetDefault("source", "apps")
 	cfg.SetDefault("dist", "templates")
 	cfg.SetDefault("icon.basepath", "https://raw.githubusercontent.com/yangkghjh/selfhosted_store/main/")
+	// cfg.SetDefault("sources", []string{"app", "docker-compose", "icon"})
+	// cfg.SetDefault("handlers", []string{"yacht"})
+	cfg.SetDefault("skipSourceFile", false)
 }
 
 func main() {
@@ -36,11 +40,12 @@ func main() {
 	}
 
 	opt := pipe.Opition{
-		SourcePath: cfg.GetString("source"),
-		DistPath:   cfg.GetString("dist"),
-		Sources:    []string{"app", "docker-compose", "icon"},
-		Handlers:   []string{"yacht"},
-		Config:     cfg,
+		SourcePath:     cfg.GetString("source"),
+		DistPath:       cfg.GetString("dist"),
+		Sources:        cfg.GetStringSlice("sources"),
+		Handlers:       cfg.GetStringSlice("handlers"),
+		SkipSourceFile: cfg.GetBool("skipSourceFile"),
+		Config:         cfg,
 	}
 
 	p, err := pipe.NewPipe(opt)

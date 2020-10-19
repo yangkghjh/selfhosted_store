@@ -100,7 +100,7 @@ func Handler(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	t.Title = a.Name
 	t.Description = a.Data.GetString("description")
 	t.Categories = a.Data.GetStringSlice("categories")
-	t.Platform = a.Data.GetString("platform")
+	t.Platform = "linux"
 	t.Note = a.Data.GetString("note")
 	if v := ctx.Get("icon"); v != nil {
 		t.Logo = v.(*icon.Icon).URL

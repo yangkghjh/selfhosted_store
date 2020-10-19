@@ -34,15 +34,17 @@ type Pipe struct {
 	Opition
 	data  map[string]interface{}
 	Count int
+	Apps  []*Context
 }
 
 // Opition for the pipe
 type Opition struct {
-	SourcePath string
-	DistPath   string
-	Sources    []string
-	Handlers   []string
-	Config     *viper.Viper
+	SourcePath     string
+	DistPath       string
+	Sources        []string
+	Handlers       []string
+	Config         *viper.Viper
+	SkipSourceFile bool
 }
 
 // InitFunc called before loading apps
@@ -62,6 +64,7 @@ func NewPipe(opt Opition) (*Pipe, error) {
 	p := &Pipe{
 		Opition: opt,
 		data:    map[string]interface{}{},
+		Apps:    []*Context{},
 	}
 
 	for _, source := range p.Sources {
@@ -107,20 +110,22 @@ func (p *Pipe) Run() error {
 		}
 	}
 
-	files, err := ioutil.ReadDir(p.SourcePath)
-	if err != nil {
-		return fmt.Errorf("read source path error: %s", err.Error())
-	}
+	if !p.SkipSourceFile {
+		files, err := ioutil.ReadDir(p.SourcePath)
+		if err != nil {
+			return fmt.Errorf("read source path error: %s", err.Error())
+		}
 
-	apps := []*Context{}
-	for _, f := range files {
-		if f.IsDir() {
-			apps = append(apps, NewContext(f.Name(), p.SourcePath+"/"+f.Name()))
+		for _, f := range files {
+			if f.IsDir() {
+				p.Apps = append(p.Apps, NewContext(f.Name(), p.SourcePath+"/"+f.Name()))
+			}
 		}
 	}
-	p.Count = len(apps)
 
-	for _, ctx := range apps {
+	p.Count = len(p.Apps)
+
+	for _, ctx := range p.Apps {
 		// load source
 		for _, source := range p.Sources {
 			f := sourceLoaders[source]
