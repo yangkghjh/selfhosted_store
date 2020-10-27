@@ -22,12 +22,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
     - name: Build
-        run: |
-          go build cli/shctl.go
-          mkidr dist
-          ./shctl
-          ./shctl -c config.unraid.yml
-          make update_unraid
+      run: |
+        go build cli/shctl.go
+        mkidr dist
+        ./shctl
+        ./shctl -c config.unraid.yml
+        make update_unraid
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
