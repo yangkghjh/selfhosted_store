@@ -28,7 +28,6 @@ jobs:
           mkdir dist
           ./shctl
           ./shctl -c config.unraid.yml
-          make update_unraid
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
