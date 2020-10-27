@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/yankghjh/selfhosted_store/cli/pipe"
@@ -12,27 +13,44 @@ import (
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/unraid"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/yacht"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var starttime time.Time
-var cfg *viper.Viper
+var (
+	cfgFile   string
+	starttime time.Time
+	cfg       *viper.Viper
+	rootCmd   = &cobra.Command{
+		Use:   "shctl",
+		Short: "Shctl is a selfhosted store generator",
+		Run:   execute,
+	}
+)
 
 func init() {
 	starttime = time.Now()
 	cfg = viper.New()
+
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "config.yml", "Config file (default is config.json)")
+
 	cfg.SetDefault("source", "apps")
 	cfg.SetDefault("dist", "templates")
-	cfg.SetDefault("icon.basepath", "https://raw.githubusercontent.com/yangkghjh/selfhosted_store/main/")
+	cfg.SetDefault("icon.basepath", "https://yangkghjh.github.io/selfhosted_store/")
 	// cfg.SetDefault("sources", []string{"app", "docker-compose", "icon"})
 	// cfg.SetDefault("handlers", []string{"yacht"})
 	cfg.SetDefault("skipSourceFile", false)
 }
 
 func main() {
-	cfg.SetConfigName("config")
-	cfg.SetConfigType("yml")
-	cfg.AddConfigPath(".")
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func execute(cmd *cobra.Command, args []string) {
+	cfg.SetConfigFile(cfgFile)
 
 	err := cfg.ReadInConfig()
 	if err != nil {

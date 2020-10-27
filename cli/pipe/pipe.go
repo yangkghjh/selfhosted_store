@@ -32,9 +32,10 @@ func init() {
 // Pipe is the pipeline for the templetes generator
 type Pipe struct {
 	Opition
-	data  map[string]interface{}
 	Count int
 	Apps  []*Context
+
+	data map[string]interface{}
 }
 
 // Opition for the pipe
@@ -63,8 +64,9 @@ type SourceHandler func(pipe *Pipe, ctx *Context) error
 func NewPipe(opt Opition) (*Pipe, error) {
 	p := &Pipe{
 		Opition: opt,
-		data:    map[string]interface{}{},
 		Apps:    []*Context{},
+
+		data: map[string]interface{}{},
 	}
 
 	for _, source := range p.Sources {

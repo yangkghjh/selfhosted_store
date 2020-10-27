@@ -1,0 +1,9 @@
+source: apps
+dist: dist/unraid
+sources:
+handlers:
+  - yacht
+skipSourceFile: true
+unraid:
+  enable: true
+  application_feed_file: build/applicationFeed.json

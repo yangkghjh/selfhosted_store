@@ -41,6 +41,10 @@ type FeedFile struct {
 
 // InitFunc for unraid community applications
 func InitFunc(p *pipe.Pipe) error {
+	if !p.Config.GetBool("unraid.enable") {
+		return nil
+	}
+
 	path := p.Config.GetString("unraid.application_feed_file")
 
 	payload, err := ioutil.ReadFile(path)

@@ -67,9 +67,17 @@ func InitFunc(pipe *pipe.Pipe) error {
 
 // FinishFunc write templetes to file
 func FinishFunc(pipe *pipe.Pipe) error {
+	for _, handler := range pipe.Handlers {
+		if handler == "yacht" {
+			goto export
+		}
+	}
+	return nil
+
+export:
 	dataset := pipe.Get("yacht").(*Dataset)
 
-	path := pipe.GetDistPath("yacht")
+	path := pipe.GetDistPath("templates", "yacht")
 	os.MkdirAll(path, os.ModePerm)
 
 	res, err := json.MarshalIndent(dataset.Templates, "", "  ")

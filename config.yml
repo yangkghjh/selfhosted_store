@@ -1,0 +1,8 @@
+source: apps
+dist: dist/apps
+sources:
+  - app
+  - docker-compose
+  - icon
+handlers:
+  - yacht
