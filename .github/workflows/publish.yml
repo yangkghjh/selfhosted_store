@@ -26,6 +26,7 @@ jobs:
         run: |
           go build cli/shctl.go
           mkdir dist
+          make update_unraid
           ./shctl
           ./shctl -c config.unraid.yml
       - name: Deploy to GitHub Pages
