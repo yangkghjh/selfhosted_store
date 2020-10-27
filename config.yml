@@ -6,3 +6,5 @@ sources:
   - icon
 handlers:
   - yacht
+icon:
+  basepath: https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/

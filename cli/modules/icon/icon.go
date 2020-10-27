@@ -44,7 +44,7 @@ func Loader(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	}
 
 	icon := &Icon{
-		URL: pipe.Config.GetString("icon.basepath") + distpath,
+		URL: pipe.Config.GetString("icon.basepath") + ctx.Name + ".png",
 	}
 
 	ctx.Set("icon", icon)
