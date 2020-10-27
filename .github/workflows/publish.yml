@@ -25,7 +25,7 @@ jobs:
       - name: Build
         run: |
           go build cli/shctl.go
-          mkidr dist
+          mkdir dist
           ./shctl
           ./shctl -c config.unraid.yml
           make update_unraid
