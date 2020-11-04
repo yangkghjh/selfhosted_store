@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-
-	"github.com/spf13/cast"
+	"strconv"
 
 	"github.com/docker/cli/cli/compose/types"
-	compose "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
-	"github.com/yankghjh/selfhosted_store/cli/modules/icon"
-
+	"github.com/spf13/cast"
 	"github.com/spf13/viper"
-	"github.com/yankghjh/selfhosted_store/cli/modules/app"
+	compose "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
 
+	"github.com/yankghjh/selfhosted_store/cli/modules/app"
+	"github.com/yankghjh/selfhosted_store/cli/modules/icon"
 	"github.com/yankghjh/selfhosted_store/cli/pipe"
 )
 
@@ -31,6 +30,11 @@ type Application struct {
 	Environment interface{}
 	Networking  interface{}
 	Data        interface{}
+	Config      interface{}
+
+	network     map[string]*types.ServicePortConfig
+	volumn      map[string]*types.ServiceVolumeConfig
+	environment map[string]*string
 }
 
 // FeedFile struct for unraid community application feed
@@ -52,20 +56,17 @@ func InitFunc(p *pipe.Pipe) error {
 		return fmt.Errorf("read file %s error: %s", path, err.Error())
 	}
 
-	feed := &FeedFile{
-		AppList: []*Application{},
-	}
-
-	err = json.Unmarshal(payload, feed)
-
+	appList, err := LoadApplications(payload)
 	if err != nil {
-		return fmt.Errorf("unmarshal unraid application_feed_file error: %s", err.Error())
+		return err
 	}
 
-	for _, a := range feed.AppList {
+	for _, a := range appList {
 		if a.Plugin || a.Repository == "" {
 			continue
 		}
+
+		a.Parse()
 
 		ctx := pipe.NewContext(a.Name, "")
 
@@ -73,21 +74,60 @@ func InitFunc(p *pipe.Pipe) error {
 		ctx.Set("icon", a.GetIcon())
 
 		// docker compose
-		service := types.ServiceConfig{}
-		service.ContainerName = a.Name
-		service.Environment = a.GetEnvironment()
-		service.Ports = a.GetPorts()
-		service.Volumes = a.GetVolumns()
-		service.Image = a.Repository
-
 		ctx.Set("compose", &compose.Compose{
 			Config: &types.Config{
-				Services: []types.ServiceConfig{service},
+				Services: []types.ServiceConfig{*a.GetServiceConfig()},
 			},
 		})
 
 		p.Apps = append(p.Apps, ctx)
 	}
+
+	return nil
+}
+
+// LoadApplications form application feed file data
+func LoadApplications(payload []byte) ([]*Application, error) {
+	feed := &FeedFile{
+		AppList: []*Application{},
+	}
+
+	err := json.Unmarshal(payload, feed)
+
+	if err != nil {
+		return nil, fmt.Errorf("unmarshal unraid application_feed_file error: %s", err.Error())
+	}
+
+	return feed.AppList, nil
+}
+
+// Parse unraid application after unmarshaled form json
+func (a *Application) Parse() error {
+	a.network = map[string]*types.ServicePortConfig{}
+	a.volumn = map[string]*types.ServiceVolumeConfig{}
+	a.environment = map[string]*string{}
+	// config
+	if a.Config != nil {
+		cfgs := []map[string]interface{}{}
+		cos := cast.ToSlice(a.Config)
+		if len(cos) > 0 {
+			for _, c := range cos {
+				if cfg := cast.ToStringMap(c); cfg != nil {
+					cfgs = append(cfgs, cfg)
+				}
+			}
+		} else if cfg := cast.ToStringMap(a.Config); cfg != nil {
+			cfgs = append(cfgs, cfg)
+		}
+
+		for _, item := range cfgs {
+			a.parseConfigItem(item)
+		}
+	}
+
+	a.parseEnvironment()
+	a.parsePorts()
+	a.parseVolumns()
 
 	return nil
 }
@@ -111,16 +151,87 @@ func (a *Application) GetIcon() *icon.Icon {
 	}
 }
 
-// GetEnvironment parse environment of application
-func (a *Application) GetEnvironment() map[string]*string {
-	env := map[string]*string{}
+// GetServiceConfig from application
+func (a *Application) GetServiceConfig() *types.ServiceConfig {
+	service := &types.ServiceConfig{}
+	service.ContainerName = a.Name
+	service.Environment = a.environment
+	service.Image = a.Repository
+
+	ports := []types.ServicePortConfig{}
+	for _, p := range a.network {
+		ports = append(ports, *p)
+	}
+	service.Ports = ports
+
+	volumns := []types.ServiceVolumeConfig{}
+	for _, v := range a.volumn {
+		volumns = append(volumns, *v)
+	}
+	service.Volumes = volumns
+
+	return service
+}
+
+func (a *Application) parseConfigItem(v map[string]interface{}) {
+	attributes := cast.ToStringMapString(v["@attributes"])
+	value := cast.ToString(v["value"])
+	if value == "" {
+		value = attributes["Default"]
+	}
+
+	switch attributes["Type"] {
+	case "Port":
+		a.addNetwork(&types.ServicePortConfig{
+			Published: cast.ToUint32(value),
+			Target:    cast.ToUint32(attributes["Target"]),
+			Protocol:  attributes["Mode"],
+		})
+	case "Path":
+		a.addVolumn(&types.ServiceVolumeConfig{
+			Target: attributes["Target"],
+			Source: value,
+		})
+	case "Variable":
+		a.addEnvironment(attributes["Target"], value)
+	}
+}
+
+func (a *Application) addNetwork(n *types.ServicePortConfig) {
+	if n.Mode != "tcp" && n.Mode != "udp" {
+		n.Mode = "tcp"
+	}
+
+	name := strconv.Itoa(int(n.Target)) + "/" + n.Mode
+
+	if _, isExisted := a.network[name]; isExisted {
+		return
+	}
+
+	a.network[name] = n
+}
+
+func (a *Application) addVolumn(v *types.ServiceVolumeConfig) {
+	if _, isExisted := a.volumn[v.Target]; isExisted {
+		return
+	}
+
+	a.volumn[v.Target] = v
+}
+
+func (a *Application) addEnvironment(key, value string) {
+	a.environment[key] = &value
+}
+
+// parse environment of application
+func (a *Application) parseEnvironment() {
 	if a.Environment == nil {
-		return env
+		return
 	}
 
 	v, ok := cast.ToStringMap(a.Environment)["Variable"]
 	if !ok {
-		return env
+		return
 	}
 
 	vs := cast.ToSlice(v)
@@ -132,29 +243,25 @@ func (a *Application) GetEnvironment() map[string]*string {
 		kv := cast.ToStringMapString(pair)
 		key := kv["Name"]
 		if key != "" {
-			value := kv["Value"]
-			env[key] = &value
+			a.addEnvironment(key, kv["Value"])
 		}
 	}
-
-	return env
 }
 
-// GetPorts parse ports of application
-func (a *Application) GetPorts() []types.ServicePortConfig {
-	ports := []types.ServicePortConfig{}
+// parse ports of application
+func (a *Application) parsePorts() {
 	if a.Networking == nil {
-		return ports
+		return
 	}
 
 	publish, ok := cast.ToStringMap(a.Networking)["Publish"]
 	if !ok {
-		return ports
+		return
 	}
 
 	pts, ok := cast.ToStringMap(publish)["Port"]
 	if !ok {
-		return ports
+		return
 	}
 
 	ps := cast.ToSlice(pts)
@@ -166,29 +273,24 @@ func (a *Application) GetPorts() []types.ServicePortConfig {
 		kv := cast.ToStringMapString(port)
 		if kv["ContainerPort"] != "" {
 			protocol := kv["Protocol"]
-			if protocol != "tcp" && protocol != "udp" {
-				protocol = "tcp"
-			}
-			ports = append(ports, types.ServicePortConfig{
+			a.addNetwork(&types.ServicePortConfig{
 				Published: cast.ToUint32(kv["HostPort"]),
 				Target:    cast.ToUint32(kv["ContainerPort"]),
 				Protocol:  protocol,
 			})
 		}
 	}
-
-	return ports
 }
 
-// GetVolumns parse environment of application
-func (a *Application) GetVolumns() []types.ServiceVolumeConfig {
-	volumes := []types.ServiceVolumeConfig{}
-	if a.Networking == nil {
-		return volumes
+// parse volumns of application
+func (a *Application) parseVolumns() {
+	if a.Data == nil {
+		return
 	}
+
 	vs, ok := cast.ToStringMap(a.Data)["Volume"]
 	if !ok {
-		return volumes
+		return
 	}
 
 	vos := cast.ToSlice(vs)
@@ -199,11 +301,10 @@ func (a *Application) GetVolumns() []types.ServiceVolumeConfig {
 	for _, v := range vos {
 		kv := cast.ToStringMapString(v)
 		if kv["ContainerDir"] != "" {
-			volumes = append(volumes, types.ServiceVolumeConfig{
+			a.addVolumn(&types.ServiceVolumeConfig{
 				Target: kv["ContainerDir"],
 				Source: kv["HostDir"],
 			})
 		}
 	}
-	return volumes
 }

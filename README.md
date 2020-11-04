@@ -18,8 +18,9 @@ This repository provides two applications stores:
 
 ## Plans
 
-- [ ] Generate from `Unraid Community Applications`
+- [*] Generate from `Unraid Community Applications`
 - [ ] Portainer 2.0 template format
+- [ ] Unriad template format
 - [ ] App store site
 - [ ] Provide `docker run` command for apps
 - [ ] Multi services support
