@@ -8,7 +8,7 @@
     "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/autoindex.png",
     "name": "autoindex",
     "image": "yangkghjh/autoindex:latest",
-    "restart_policy": "unless-stopped",
+    "restart_policy": "always",
     "ports": [
       {
         "4000": "4000:4000/tcp"
@@ -30,7 +30,7 @@
     "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/awtrix2.png",
     "name": "awtrix2",
     "image": "whyet/awtrix2:latest",
-    "restart_policy": "unless-stopped",
+    "restart_policy": "always",
     "ports": [
       {
         "5568": "5568:5568/udp",
@@ -56,7 +56,7 @@
     "note": "Open with \\\\IP\\yacht ,Iamges: https://hub.docker.com/r/dperson/samba",
     "name": "samba",
     "image": "dperson/samba",
-    "restart_policy": "unless-stopped",
+    "restart_policy": "always",
     "ports": [
       {
         "139": "139:139/tcp",
@@ -88,7 +88,7 @@
     "note": "通过 IP:7070 打开。",
     "name": "yarr",
     "image": "yangkghjh/yarr:latest",
-    "restart_policy": "unless-stopped",
+    "restart_policy": "always",
     "ports": [
       {
         "7070": "7070:7070/tcp"
