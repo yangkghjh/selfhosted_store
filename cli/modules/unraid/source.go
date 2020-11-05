@@ -35,6 +35,7 @@ type Application struct {
 	network     map[string]*types.ServicePortConfig
 	volumn      map[string]*types.ServiceVolumeConfig
 	environment map[string]*string
+	networkMode string
 }
 
 // FeedFile struct for unraid community application feed
@@ -42,6 +43,8 @@ type FeedFile struct {
 	Apps    int            `json:"apps"`
 	AppList []*Application `json:"applist"`
 }
+
+var defaultRestartPolicy string = "unless-stopped"
 
 // InitFunc for unraid community applications
 func InitFunc(p *pipe.Pipe) error {
@@ -157,6 +160,8 @@ func (a *Application) GetServiceConfig() *types.ServiceConfig {
 	service.ContainerName = a.Name
 	service.Environment = a.environment
 	service.Image = a.Repository
+	service.Restart = defaultRestartPolicy
+	service.NetworkMode = a.networkMode
 
 	ports := []types.ServicePortConfig{}
 	for _, p := range a.network {
@@ -198,10 +203,9 @@ func (a *Application) parseConfigItem(v map[string]interface{}) {
 }
 
 func (a *Application) addNetwork(n *types.ServicePortConfig) {
-	if n.Mode != "tcp" && n.Mode != "udp" {
-		n.Mode = "tcp"
+	if n.Protocol != "tcp" && n.Protocol != "udp" {
+		n.Protocol = "tcp"
 	}
-
 	name := strconv.Itoa(int(n.Target)) + "/" + n.Mode
 
 	if _, isExisted := a.network[name]; isExisted {
@@ -254,7 +258,15 @@ func (a *Application) parsePorts() {
 		return
 	}
 
-	publish, ok := cast.ToStringMap(a.Networking)["Publish"]
+	network := cast.ToStringMap(a.Networking)
+	if m, ok := network["Mode"]; ok {
+		mode := cast.ToString(m)
+		if mode == "bridge" || mode == "host" || mode == "none" {
+			a.networkMode = mode
+		}
+	}
+
+	publish, ok := network["Publish"]
 	if !ok {
 		return
 	}

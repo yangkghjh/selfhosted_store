@@ -38,6 +38,7 @@ type Template struct {
 	Name          string              `json:"name"`
 	Image         string              `json:"image"`
 	RestartPolicy string              `json:"restart_policy,omitempty"`
+	NetworkMode   string              `json:"network_mode,omitempty"`
 	Ports         []map[string]string `json:"ports,omitempty"`
 	Volumes       []VolumeConfig      `json:"volumes,omitempty"`
 	Environment   []EnvironmentConfig `json:"env,omitempty"`
@@ -116,9 +117,8 @@ func Handler(pipe *pipe.Pipe, ctx *pipe.Context) error {
 
 	t.Name = service.ContainerName
 	t.Image = service.Image
-	if service.Restart == "always" {
-		t.RestartPolicy = "unless-stopped"
-	}
+	t.RestartPolicy = service.Restart
+	t.NetworkMode = service.NetworkMode
 
 	if len(service.Ports) > 0 {
 		t.Ports = []map[string]string{}
