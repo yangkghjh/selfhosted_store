@@ -26,7 +26,7 @@ type Template struct {
 	Type        int      `json:"type"`
 	Title       string   `json:"title"`
 	Description string   `json:"description,omitempty"`
-	Categories  []string `json:"categories,omitempty"`
+	Categories  []string `json:"categories"`
 	Platform    string   `json:"platform"`
 	Note        string   `json:"note,omitempty"`
 	Logo        string   `json:"logo,omitempty"`
