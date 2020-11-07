@@ -23,12 +23,14 @@ This repository provides two applications stores:
 | Store | Format | URL |
 | --- | --- | --- |
 | Apps | Yacht | https://yangkghjh.github.io/selfhosted_store/apps/templates/yacht/yacht.json |
+| Apps | Portainer | https://yangkghjh.github.io/selfhosted_store/apps/templates/portainer/template.json |
 | Unraid | Yacht | https://yangkghjh.github.io/selfhosted_store/unraid/templates/yacht/yacht.json |
+| Unraid | Portainer | https://yangkghjh.github.io/selfhosted_store/unraid/templates/portainer/template.json |
 
 ## Plans
 
 - [x] Generate from `Unraid Community Applications`
-- [ ] Portainer 2.0 template format
+- [x] Portainer 2.0 template format
 - [ ] Unriad template format
 - [ ] App store site
 - [ ] Provide `docker run` command for apps
