@@ -3,8 +3,10 @@ loaders:
     type: app
     path: apps
     icon: 
-      basepath: https://yangkghjh.github.io/selfhosted_store/
+      basepath: https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/
 generaters:
   yacht:
     type: yacht
+  portainer:
+    type: portainer
 dist: dist/apps

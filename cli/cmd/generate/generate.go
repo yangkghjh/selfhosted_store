@@ -11,6 +11,7 @@ import (
 
 	// modules
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/app"
+	_ "github.com/yankghjh/selfhosted_store/cli/modules/portainer"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/unraid"
 	_ "github.com/yankghjh/selfhosted_store/cli/modules/yacht"
 )

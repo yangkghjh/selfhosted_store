@@ -6,3 +6,5 @@ loaders:
 generaters:
   yacht:
     type: yacht
+  portainer:
+    type: portainer
