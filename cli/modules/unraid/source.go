@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"strings"
 
 	"github.com/docker/cli/cli/compose/types"
 	"github.com/spf13/cast"
@@ -22,6 +23,7 @@ type Application struct {
 	Name        string
 	Description string
 	Overview    string
+	Category    string
 	Icon        string
 	Repository  string
 	Environment interface{}
@@ -123,6 +125,7 @@ func (a *Application) ToProjectApplication() *project.Application {
 	app.Description = a.Description
 	app.Overview = a.Overview
 	app.Icon = a.Icon
+	app.Category = strings.Split(a.Category, " ")
 
 	app.Services = append(app.Services, a.GetServiceConfig())
 
