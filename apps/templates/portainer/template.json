@@ -1,0 +1,89 @@
+{
+  "version": "2",
+  "templates": [
+    {
+      "type": 1,
+      "title": "AutoIndex",
+      "platform": "linux",
+      "note": "Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.",
+      "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/autoindex.png",
+      "name": "autoindex",
+      "image": "yangkghjh/autoindex:latest",
+      "restart_policy": "always",
+      "ports": [
+        "4000:4000/tcp"
+      ],
+      "volumes": [
+        {
+          "container": "/data",
+          "bind": "/data"
+        }
+      ]
+    },
+    {
+      "type": 1,
+      "title": "AWTRIX2",
+      "platform": "linux",
+      "note": "(AWsome maTRIX) is a full color dot matrix that displays applications from simple time display to Fortnite account statistics.",
+      "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/awtrix2.png",
+      "name": "awtrix2",
+      "image": "whyet/awtrix2:latest",
+      "restart_policy": "always",
+      "ports": [
+        "7000:7000/tcp",
+        "7001:7001/tcp",
+        "5568:5568/udp"
+      ],
+      "volumes": [
+        {
+          "container": "/data",
+          "bind": "!data/awtrix2"
+        }
+      ]
+    },
+    {
+      "type": 1,
+      "title": "Samba",
+      "platform": "linux",
+      "note": "Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.",
+      "name": "samba",
+      "image": "dperson/samba",
+      "restart_policy": "always",
+      "ports": [
+        "139:139/tcp",
+        "445:445/tcp"
+      ],
+      "volumes": [
+        {
+          "container": "/mount",
+          "bind": "/yacht"
+        }
+      ],
+      "env": [
+        {
+          "name": "SHARE",
+          "label": "SHARE",
+          "default": "yacht;/mount"
+        }
+      ]
+    },
+    {
+      "type": 1,
+      "title": "Yarr",
+      "platform": "linux",
+      "note": "开源 RSS 阅读器，Go 实现，数据存储于 SQLite。",
+      "name": "yarr",
+      "image": "yangkghjh/yarr:latest",
+      "restart_policy": "always",
+      "ports": [
+        "7070:7070/tcp"
+      ],
+      "volumes": [
+        {
+          "container": "/data",
+          "bind": "!data/yarr"
+        }
+      ]
+    }
+  ]
+}
