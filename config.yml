@@ -1,10 +1,10 @@
-source: apps
+loaders:
+  apps:
+    type: app
+    path: apps
+    icon: 
+      basepath: https://yangkghjh.github.io/selfhosted_store/
+generaters:
+  yacht:
+    type: yacht
 dist: dist/apps
-sources:
-  - app
-  - docker-compose
-  - icon
-handlers:
-  - yacht
-icon:
-  basepath: https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/

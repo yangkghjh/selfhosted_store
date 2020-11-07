@@ -7,17 +7,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/yankghjh/selfhosted_store/cli/modules/icon"
+	"github.com/yankghjh/selfhosted_store/cli/project"
 
-	"github.com/yankghjh/selfhosted_store/cli/modules/app"
-	compose "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
 	"github.com/yankghjh/selfhosted_store/cli/pipe"
 )
 
 func init() {
-	pipe.RegisterInitFunc("yacht", InitFunc)
-	pipe.RegisterFinishFunc("yacht", FinishFunc)
-	pipe.RegisterSourceHandler("yacht", Handler)
+	project.RegisterGenerater("yacht", Generater)
 }
 
 // Dataset yacht app dataset
@@ -30,7 +26,7 @@ type Template struct {
 	Type        int      `json:"type"`
 	Title       string   `json:"title"`
 	Description string   `json:"description,omitempty"`
-	Categories  []string `json:"categories"`
+	Categories  []string `json:"categories,omitempty"`
 	Platform    string   `json:"platform"`
 	Note        string   `json:"note,omitempty"`
 	Logo        string   `json:"logo,omitempty"`
@@ -66,28 +62,17 @@ func InitFunc(pipe *pipe.Pipe) error {
 	return nil
 }
 
-// FinishFunc write templetes to file
-func FinishFunc(pipe *pipe.Pipe) error {
-	for _, handler := range pipe.Handlers {
-		if handler == "yacht" {
-			goto export
-		}
-	}
-	return nil
-
-export:
-	dataset := pipe.Get("yacht").(*Dataset)
-
-	path := pipe.GetDistPath("templates", "yacht")
-	os.MkdirAll(path, os.ModePerm)
-
-	res, err := json.MarshalIndent(dataset.Templates, "", "  ")
+// Generater yacht template
+func Generater(o *project.Operator) error {
+	res, err := Convert(o.Project.Apps)
 	if err != nil {
-		return fmt.Errorf("marshal templates error: %s", err.Error())
+		return err
 	}
 
+	path := o.Project.GetDistPath("templates", "yacht")
+	os.MkdirAll(path, os.ModePerm)
 	filename := path + "/yacht.json"
-	ioutil.WriteFile(filename, res, os.ModePerm)
+	err = ioutil.WriteFile(filename, res, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("write template file [%s] error: %s", filename, err.Error())
 	}
@@ -95,25 +80,38 @@ export:
 	return nil
 }
 
-// Handler generate yacht app definition
-func Handler(pipe *pipe.Pipe, ctx *pipe.Context) error {
-	t := new(Template)
-	a := ctx.Get("app").(*app.App)
-	c := ctx.Get("compose").(*compose.Compose)
-	if len(c.Config.Services) < 1 {
-		return fmt.Errorf("no service found in compose")
+// Convert applications to yacht template
+func Convert(apps []*project.Application) ([]byte, error) {
+	dataset := []*Template{}
+
+	for _, app := range apps {
+		t, err := ConvertApplication(app)
+		if err != nil {
+			return nil, fmt.Errorf("convert application to yacht template error: %s", err.Error())
+		}
+		dataset = append(dataset, t)
 	}
-	service := c.Config.Services[0]
+
+	res, err := json.MarshalIndent(dataset, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("marshal templates error: %s", err.Error())
+	}
+
+	return res, nil
+}
+
+// ConvertApplication convert single application
+func ConvertApplication(a *project.Application) (*Template, error) {
+	t := new(Template)
+	service := a.Services[0]
 
 	t.Type = 1
 	t.Title = a.Name
-	t.Description = a.Data.GetString("description")
-	t.Categories = a.Data.GetStringSlice("categories")
+	t.Description = a.Overview
+	t.Categories = a.Category
 	t.Platform = "linux"
-	t.Note = a.Data.GetString("note")
-	if v := ctx.Get("icon"); v != nil {
-		t.Logo = v.(*icon.Icon).URL
-	}
+	t.Note = a.Description
+	t.Logo = a.Icon
 
 	t.Name = service.ContainerName
 	t.Image = service.Image
@@ -160,8 +158,5 @@ func Handler(pipe *pipe.Pipe, ctx *pipe.Context) error {
 		}
 	}
 
-	dataset := pipe.Get("yacht").(*Dataset)
-	dataset.Templates = append(dataset.Templates, t)
-
-	return nil
+	return t, nil
 }

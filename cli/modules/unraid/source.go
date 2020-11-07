@@ -8,16 +8,12 @@ import (
 
 	"github.com/docker/cli/cli/compose/types"
 	"github.com/spf13/cast"
-	"github.com/spf13/viper"
-	compose "github.com/yankghjh/selfhosted_store/cli/modules/docker-compose"
 
-	"github.com/yankghjh/selfhosted_store/cli/modules/app"
-	"github.com/yankghjh/selfhosted_store/cli/modules/icon"
-	"github.com/yankghjh/selfhosted_store/cli/pipe"
+	"github.com/yankghjh/selfhosted_store/cli/project"
 )
 
 func init() {
-	pipe.RegisterInitFunc("unraid", InitFunc)
+	project.RegisterLoader("unraid", Loader)
 }
 
 // Application struct for unraid community application feed
@@ -25,6 +21,7 @@ type Application struct {
 	Plugin      bool
 	Name        string
 	Description string
+	Overview    string
 	Icon        string
 	Repository  string
 	Environment interface{}
@@ -46,13 +43,9 @@ type FeedFile struct {
 
 var defaultRestartPolicy string = "unless-stopped"
 
-// InitFunc for unraid community applications
-func InitFunc(p *pipe.Pipe) error {
-	if !p.Config.GetBool("unraid.enable") {
-		return nil
-	}
-
-	path := p.Config.GetString("unraid.application_feed_file")
+// Loader for unraid community applications
+func Loader(o *project.Operator) error {
+	path := o.Config.GetString("application_feed_file")
 
 	payload, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -70,20 +63,7 @@ func InitFunc(p *pipe.Pipe) error {
 		}
 
 		a.Parse()
-
-		ctx := pipe.NewContext(a.Name, "")
-
-		ctx.Set("app", a.GetApp())
-		ctx.Set("icon", a.GetIcon())
-
-		// docker compose
-		ctx.Set("compose", &compose.Compose{
-			Config: &types.Config{
-				Services: []types.ServiceConfig{*a.GetServiceConfig()},
-			},
-		})
-
-		p.Apps = append(p.Apps, ctx)
+		o.Project.Apps = append(o.Project.Apps, a.ToProjectApplication())
 	}
 
 	return nil
@@ -135,23 +115,18 @@ func (a *Application) Parse() error {
 	return nil
 }
 
-// GetApp parse app metadata from application
-func (a *Application) GetApp() *app.App {
-	data := viper.New()
-	data.Set("description", a.Description)
-	appyml := &app.App{
-		Name: a.Name,
-		Data: data,
-	}
+// ToProjectApplication convert to project application
+func (a *Application) ToProjectApplication() *project.Application {
+	app := project.NewApplication()
 
-	return appyml
-}
+	app.Name = a.Name
+	app.Description = a.Description
+	app.Overview = a.Overview
+	app.Icon = a.Icon
 
-// GetIcon parse icon data from application
-func (a *Application) GetIcon() *icon.Icon {
-	return &icon.Icon{
-		URL: a.Icon,
-	}
+	app.Services = append(app.Services, a.GetServiceConfig())
+
+	return app
 }
 
 // GetServiceConfig from application

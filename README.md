@@ -2,6 +2,15 @@
 
 Multi-platform selfhosted services templates generated from `docker-compose.yml`.
 
+## Features
+
+Nothing completed yet.
+
+- [ ] Web selfhosted application store generater.
+- [ ] Dcoker compose file converter, as a go and wasm module.
+- [ ] Convert some popular selfhosted application template to other format.
+    - [x] Unraid Community Applications
+
 ## Templates
 
 This repository provides two applications stores:

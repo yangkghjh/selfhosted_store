@@ -4,3 +4,8 @@ update_unraid:
 
 clean:
 	rm -rf dist/*
+
+generate:
+	mkdir -p dist
+	./shctl generate
+	./shctl generate -c config.unraid.yml

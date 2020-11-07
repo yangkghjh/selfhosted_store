@@ -7,6 +7,7 @@ import (
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
 	"github.com/yankghjh/selfhosted_store/cli/pipe"
+	"github.com/yankghjh/selfhosted_store/cli/project"
 )
 
 func init() {
@@ -18,7 +19,7 @@ type Compose struct {
 	Config *types.Config
 }
 
-// Loader for app.yml
+// Loader for docker-compose.yml
 func Loader(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	path := ctx.GetPath("docker-compose.yml")
 
@@ -45,6 +46,34 @@ func Loader(pipe *pipe.Pipe, ctx *pipe.Context) error {
 	ctx.Set("compose", &Compose{
 		Config: config,
 	})
+
+	return nil
+}
+
+// LoadApplication from docker-compose.yml
+func LoadApplication(a *project.Application, payload []byte) error {
+	source, err := loader.ParseYAML(payload)
+	if err != nil {
+		return fmt.Errorf("parse docker compose yaml error: %s", err.Error())
+	}
+
+	config, err := loader.Load(types.ConfigDetails{
+		ConfigFiles: []types.ConfigFile{
+			{Filename: "docker-compose.yml", Config: source},
+		},
+		Environment: map[string]string{},
+	})
+	if err != nil {
+		return fmt.Errorf("load docker compose conifg error: %s", err.Error())
+	}
+
+	if len(config.Services) == 0 {
+		return fmt.Errorf("load docker compose services error: no service found")
+	}
+
+	for _, service := range config.Services {
+		a.Services = append(a.Services, &service)
+	}
 
 	return nil
 }
