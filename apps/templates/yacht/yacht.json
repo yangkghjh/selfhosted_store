@@ -2,10 +2,9 @@
   {
     "type": 1,
     "title": "AutoIndex",
-    "description": "Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.",
-    "categories": null,
     "platform": "linux",
-    "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/autoindex.png",
+    "note": "Lightweight go web server that provides a searchable directory index. Optimized for handling large numbers of files (100k+) and remote file systems (with high latency) through a continously updated directory cache.",
+    "logo": "https://yangkghjh.github.io/selfhosted_store/autoindex.png",
     "name": "autoindex",
     "image": "yangkghjh/autoindex:latest",
     "restart_policy": "always",
@@ -24,10 +23,9 @@
   {
     "type": 1,
     "title": "AWTRIX2",
-    "description": "(AWsome maTRIX) is a full color dot matrix that displays applications from simple time display to Fortnite account statistics.",
-    "categories": null,
     "platform": "linux",
-    "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icons/awtrix2.png",
+    "note": "(AWsome maTRIX) is a full color dot matrix that displays applications from simple time display to Fortnite account statistics.",
+    "logo": "https://yangkghjh.github.io/selfhosted_store/awtrix2.png",
     "name": "awtrix2",
     "image": "whyet/awtrix2:latest",
     "restart_policy": "always",
@@ -48,12 +46,8 @@
   {
     "type": 1,
     "title": "Samba",
-    "description": "Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.",
-    "categories": [
-      "Files"
-    ],
     "platform": "linux",
-    "note": "Open with \\\\IP\\yacht ,Iamges: https://hub.docker.com/r/dperson/samba",
+    "note": "Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.",
     "name": "samba",
     "image": "dperson/samba",
     "restart_policy": "always",
@@ -80,12 +74,8 @@
   {
     "type": 1,
     "title": "Yarr",
-    "description": "开源 RSS 阅读器，Go 实现，数据存储于 SQLite。",
-    "categories": [
-      "Read"
-    ],
     "platform": "linux",
-    "note": "通过 IP:7070 打开。",
+    "note": "开源 RSS 阅读器，Go 实现，数据存储于 SQLite。",
     "name": "yarr",
     "image": "yangkghjh/yarr:latest",
     "restart_policy": "always",
