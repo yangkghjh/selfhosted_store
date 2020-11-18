@@ -1,0 +1,8 @@
+version: "3.0"
+
+services:
+  motivation:
+    image: yangkghjh/motivation:latest
+    restart: unless-stopped
+    ports: 
+      - 80:80
