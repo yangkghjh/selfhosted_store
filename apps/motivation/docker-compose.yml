@@ -2,6 +2,7 @@ version: "3.0"
 
 services:
   motivation:
+    container_name: motivation
     image: yangkghjh/motivation:latest
     restart: unless-stopped
     ports: 
