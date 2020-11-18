@@ -43,6 +43,19 @@
     },
     {
       "type": 1,
+      "title": "Motivation",
+      "platform": "linux",
+      "note": "A web page with your age.",
+      "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/motivation.png",
+      "name": "",
+      "image": "yangkghjh/motivation:latest",
+      "restart_policy": "unless-stopped",
+      "ports": [
+        "80:80/tcp"
+      ]
+    },
+    {
+      "type": 1,
       "title": "Samba",
       "platform": "linux",
       "note": "Since 1992, Samba has provided secure, stable and fast file and print services for all clients using the SMB/CIFS protocol, such as all versions of DOS and Windows, OS/2, Linux and many others.",

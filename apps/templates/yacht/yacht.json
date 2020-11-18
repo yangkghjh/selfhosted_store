@@ -47,6 +47,22 @@
   },
   {
     "type": 1,
+    "title": "Motivation",
+    "categories": null,
+    "platform": "linux",
+    "note": "A web page with your age.",
+    "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/motivation.png",
+    "name": "",
+    "image": "yangkghjh/motivation:latest",
+    "restart_policy": "unless-stopped",
+    "ports": [
+      {
+        "80": "80:80/tcp"
+      }
+    ]
+  },
+  {
+    "type": 1,
     "title": "Samba",
     "categories": null,
     "platform": "linux",
