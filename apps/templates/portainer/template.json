@@ -47,7 +47,7 @@
       "platform": "linux",
       "note": "A web page with your age.",
       "logo": "https://yangkghjh.github.io/selfhosted_store/apps/assets/icon/motivation.png",
-      "name": "",
+      "name": "motivation",
       "image": "yangkghjh/motivation:latest",
       "restart_policy": "unless-stopped",
       "ports": [
