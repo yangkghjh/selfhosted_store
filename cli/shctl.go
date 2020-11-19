@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/yankghjh/selfhosted_store/cli/cmd/convert"
 	"github.com/yankghjh/selfhosted_store/cli/cmd/generate"
 )
 
@@ -15,6 +16,7 @@ var (
 
 func init() {
 	command.AddCommand(generate.Command)
+	command.AddCommand(convert.Command)
 }
 
 func main() {

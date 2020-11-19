@@ -9,3 +9,6 @@ generate:
 	mkdir -p dist
 	./shctl generate
 	./shctl generate -c config.unraid.yml
+
+wasm:
+	GOOS=js GOARCH=wasm go build -o shs.wasm ./cli/wasm 
